@@ -2,10 +2,17 @@ import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 import TrackCard from '@/components/music/TrackCard';
 import { MOCK_TRACKS } from '@/data/mockData';
+import { AuthUser } from '@/App';
 
 const TABS = ['Треки', 'Плейлисты', 'Подписки'];
 
-export default function Profile() {
+function getInitials(name: string) {
+  return name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+interface Props { user: AuthUser; }
+
+export default function Profile({ user }: Props) {
   const [activeTab, setActiveTab] = useState('Треки');
   const myTracks = MOCK_TRACKS.slice(0, 4);
 
@@ -26,11 +33,9 @@ export default function Profile() {
       <div className="px-6">
         <div className="flex items-end justify-between -mt-14 mb-4">
           <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop"
-              alt="profile"
-              className="w-28 h-28 rounded-2xl object-cover border-4 border-[hsl(var(--background))]"
-            />
+            <div className="w-28 h-28 rounded-2xl gradient-bg border-4 border-[hsl(var(--background))] flex items-center justify-center text-white text-3xl font-black">
+              {getInitials(user.name)}
+            </div>
             <div className="absolute bottom-2 right-2 w-3 h-3 bg-green-400 rounded-full border-2 border-[hsl(var(--background))]" />
           </div>
           <div className="flex gap-2 mb-2">
@@ -46,8 +51,8 @@ export default function Profile() {
         </div>
 
         <div className="mb-6">
-          <h1 className="text-2xl font-black text-white mb-0.5">Alex Monroe</h1>
-          <p className="text-[hsl(var(--muted-foreground))] text-sm mb-3">@alexmonroe · Москва</p>
+          <h1 className="text-2xl font-black text-white mb-0.5">{user.name}</h1>
+          <p className="text-[hsl(var(--muted-foreground))] text-sm mb-3">{user.email}</p>
           <p className="text-[hsl(var(--muted-foreground))] text-sm max-w-lg">
             Музыкант и продюсер. Создаю электронную музыку и поп-треки. Слушай, делись, вдохновляйся.
           </p>

@@ -1,0 +1,42 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Register new user",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "register", "name": "Test User", "email": "test_wavely_001@example.com", "password": "secret123"},
+      "expectedStatus": 200,
+      "expectedBody": {"ok": true},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Register duplicate email",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "register", "name": "Test User", "email": "test_wavely_001@example.com", "password": "secret123"},
+      "expectedStatus": 409
+    },
+    {
+      "name": "Login success",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "email": "test_wavely_001@example.com", "password": "secret123"},
+      "expectedStatus": 200,
+      "expectedBody": {"ok": true},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login wrong password",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "email": "test_wavely_001@example.com", "password": "wrongpass"},
+      "expectedStatus": 401
+    }
+  ]
+}

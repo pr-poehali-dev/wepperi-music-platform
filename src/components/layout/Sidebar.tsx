@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
+import { AuthUser } from '@/App';
 
 const NAV_ITEMS = [
   { to: '/', icon: 'Home', label: 'Главная' },
@@ -12,7 +13,16 @@ const NAV_ITEMS = [
   { to: '/profile', icon: 'User', label: 'Профиль' },
 ];
 
-export default function Sidebar() {
+function getInitials(name: string) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+interface Props {
+  user: AuthUser;
+  onLogout: () => void;
+}
+
+export default function Sidebar({ user, onLogout }: Props) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -65,15 +75,20 @@ export default function Sidebar() {
       {!collapsed && (
         <div className="px-4 py-4 border-t border-[hsl(var(--sidebar-border))]">
           <div className="glass rounded-xl p-3 flex items-center gap-3">
-            <img
-              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop"
-              className="w-9 h-9 rounded-full object-cover border-2 border-purple-500"
-              alt="avatar"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">Alex Monroe</p>
-              <p className="text-xs text-[hsl(var(--muted-foreground))] truncate">@alexmonroe</p>
+            <div className="w-9 h-9 rounded-full gradient-bg flex items-center justify-center flex-shrink-0 border-2 border-purple-500 text-white text-xs font-bold">
+              {getInitials(user.name)}
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+              <p className="text-xs text-[hsl(var(--muted-foreground))] truncate">{user.email}</p>
+            </div>
+            <button
+              onClick={onLogout}
+              title="Выйти"
+              className="text-[hsl(var(--muted-foreground))] hover:text-red-400 transition-colors flex-shrink-0"
+            >
+              <Icon name="LogOut" size={16} />
+            </button>
           </div>
         </div>
       )}

@@ -16,10 +16,33 @@ import Search from "./pages/Search";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function getSavedUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem('wavely_user');
+    const token = localStorage.getItem('wavely_token');
+    if (raw && token) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return null;
+}
+
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(getSavedUser);
+
+  const handleAuth = (u: AuthUser) => setUser(u);
+
+  const handleLogout = () => {
+    localStorage.removeItem('wavely_token');
+    localStorage.removeItem('wavely_user');
+    setUser(null);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -31,20 +54,20 @@ const App = () => {
             <Route
               path="/auth"
               element={
-                isAuthed
+                user
                   ? <Navigate to="/" replace />
-                  : <Auth onAuth={() => setIsAuthed(true)} />
+                  : <Auth onAuth={handleAuth} />
               }
             />
-            {isAuthed ? (
-              <Route element={<Layout />}>
+            {user ? (
+              <Route element={<Layout user={user} onLogout={handleLogout} />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/feed" element={<Feed />} />
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/playlists" element={<Playlists />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/notifications" element={<Notifications />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<Profile user={user} />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="*" element={<NotFound />} />
               </Route>

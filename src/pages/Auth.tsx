@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
 
+const AUTH_URL = 'https://functions.poehali.dev/3a6dd3c1-44d7-424a-81a8-ebbd8f7e7b29';
+
 type Mode = 'login' | 'register';
 
 interface Props {
-  onAuth: () => void;
+  onAuth: (user: { id: number; name: string; email: string }) => void;
 }
 
 export default function Auth({ onAuth }: Props) {
@@ -32,10 +34,33 @@ export default function Auth({ onAuth }: Props) {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    onAuth();
-    navigate('/');
+    try {
+      const payload =
+        mode === 'register'
+          ? { action: 'register', name: form.name, email: form.email, password: form.password }
+          : { action: 'login', email: form.email, password: form.password };
+
+      const res = await fetch(AUTH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = typeof res === 'object' ? await res.json() : {};
+
+      if (!res.ok) {
+        setErrors({ form: data.error || 'Ошибка сервера' });
+        return;
+      }
+
+      localStorage.setItem('wavely_token', data.token);
+      localStorage.setItem('wavely_user', JSON.stringify(data.user));
+      onAuth(data.user);
+      navigate('/');
+    } catch {
+      setErrors({ form: 'Не удалось подключиться к серверу' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,6 +225,13 @@ export default function Auth({ onAuth }: Props) {
                 <button type="button" className="text-sm text-purple-400 hover:text-purple-300 transition-colors">
                   Забыли пароль?
                 </button>
+              </div>
+            )}
+
+            {errors.form && (
+              <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">
+                <Icon name="AlertCircle" size={16} className="text-red-400 flex-shrink-0" />
+                <p className="text-red-400 text-sm">{errors.form}</p>
               </div>
             )}
 
