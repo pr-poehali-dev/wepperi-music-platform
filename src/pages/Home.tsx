@@ -1,15 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import TrackCard from '@/components/music/TrackCard';
 import PlaylistCard from '@/components/music/PlaylistCard';
 import { MOCK_TRACKS, MOCK_PLAYLISTS, GENRES } from '@/data/mockData';
+import { usePlayer } from '@/context/PlayerContext';
+
+const GET_TRACKS_URL = 'https://functions.poehali.dev/c72a2262-a2d2-409b-acd9-c7cec4b486e1';
+
+interface RealTrack {
+  id: number; title: string; artist: string; genre: string;
+  duration: number; audio_url: string; cover_url: string; plays: number;
+}
 
 export default function Home() {
   const [activeGenre, setActiveGenre] = useState('Все');
+  const [realTracks, setRealTracks] = useState<RealTrack[]>([]);
+  const { play } = usePlayer();
+
+  useEffect(() => {
+    fetch(GET_TRACKS_URL)
+      .then(r => r.json())
+      .then(d => { if (d.ok) setRealTracks(d.tracks); })
+      .catch(() => {});
+  }, []);
+
+  const allTracks = realTracks.length > 0 ? realTracks : MOCK_TRACKS as unknown as RealTrack[];
 
   const filteredTracks = activeGenre === 'Все'
-    ? MOCK_TRACKS
-    : MOCK_TRACKS.filter(t => t.genre === activeGenre);
+    ? allTracks
+    : allTracks.filter(t => t.genre === activeGenre);
 
   const trendingTracks = [...MOCK_TRACKS].sort((a, b) => b.plays - a.plays).slice(0, 5);
 

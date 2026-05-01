@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { PlayerProvider } from "./context/PlayerContext";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import Feed from "./pages/Feed";
@@ -46,6 +47,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PlayerProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -63,7 +65,7 @@ const App = () => {
               <Route element={<Layout user={user} onLogout={handleLogout} />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/feed" element={<Feed />} />
-                <Route path="/upload" element={<Upload />} />
+                <Route path="/upload" element={<Upload user={user} />} />
                 <Route path="/playlists" element={<Playlists />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/notifications" element={<Notifications />} />
@@ -77,6 +79,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </PlayerProvider>
     </QueryClientProvider>
   );
 };

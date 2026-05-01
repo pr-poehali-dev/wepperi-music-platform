@@ -1,3 +1,5 @@
 {
+  "upload-track": "https://functions.poehali.dev/93b306d3-d2ca-494c-9903-283f14af22a3",
+  "get-tracks": "https://functions.poehali.dev/c72a2262-a2d2-409b-acd9-c7cec4b486e1",
   "auth": "https://functions.poehali.dev/3a6dd3c1-44d7-424a-81a8-ebbd8f7e7b29"
 }
